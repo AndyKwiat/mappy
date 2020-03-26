@@ -173,7 +173,9 @@ function measureAndShowDist( routes, algo, color ,spots){
     console.log("--------" + algo+ "----------");
    let dist = measureDistance(routes,spots);
         let coords = routes.map(x=>spots[x].coords);
+        let ex = coords.pop();
         L.polyline(coords, {color: color, weight:5}).addTo(mymap);
+          L.polyline([coords[coords.length-1],ex], {color: color, weight:2}).addTo(mymap);
         console.log("Distance: (" + coords.length+")-->" + dist);
 
     return dist;
@@ -257,7 +259,7 @@ function bruteForce(spots){
     for (let i=0; i < perms.length; i++ ){
         perms[i].push(0);
         perms[i].unshift(0);
-        let dist = measureDistance(perms[i]);
+        let dist = measureDistance(perms[i],spots);
         if ( !winner || dist < min ){
             min = dist;
             winner = i;
@@ -312,7 +314,7 @@ function findClusters(numClusters, candidates, spots, show=false ){
             k[i] = total;
 
         }
-        console.log("change--->" + change * 100);
+        //console.log("change--->" + change * 100);
         if ( change *100 < .1 ){
             break;
         }
@@ -331,7 +333,9 @@ function findClusters(numClusters, candidates, spots, show=false ){
             }
         }
     }
-    return members;
+    return k.map((spot,index)=>{
+       return {coords:spot, members:members[index]};
+    });
 
 }
 function clusters(spots){
@@ -339,17 +343,23 @@ function clusters(spots){
     for ( let i=1; i <spots.length; i++ ){
         remainders.push(i);
     }
-    findClusters(5, remainders,spots,true);
+    let clusters = findClusters(5, remainders,spots,true);
+    clusters.unshift(spots[0]);
+    let clusterPath = bruteForce(clusters);
+    measureAndShowDist(clusterPath,"clusters","black",clusters);
+
+
+
 }
 function onEverythingLoaded(){
 
     // measureAndShowDist(defaultRandomRoutes(),"default -random", 'red');
 
-    measureAndShowDist(closestNext(places), "closestNext", 'blue' ,places);
+   // measureAndShowDist(closestNext(places), "closestNext", 'blue' ,places);
 
     //measureAndShowDist(bruteForce(), "bruteForce", 'yellow');
-    let routes = closestNext(places);
-    dumpRoutes(routes,places);
+  //  let routes = closestNext(places);
+//    dumpRoutes(routes,places);
 
     clusters(places);
 

@@ -24,8 +24,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/myjs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="182" column="9" selection-start-line="182" selection-start-column="9" selection-end-line="182" selection-end-column="9" />
+            <state relative-caret-position="685">
+              <caret line="347" column="33" selection-start-line="347" selection-start-column="33" selection-end-line="347" selection-end-column="33" />
               <folding>
                 <element signature="e#9#15#0" expanded="true" />
               </folding>
@@ -62,9 +62,12 @@
       <find>poly</find>
       <find>findcluster</find>
       <find>findclusters</find>
-      <find>measureandshow</find>
       <find>places</find>
       <find>dumproutes</find>
+      <find>bruteforce</find>
+      <find>measureandshow</find>
+      <find>measuredistance</find>
+      <find>findclosest</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -175,8 +178,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/myjs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="182" column="9" selection-start-line="182" selection-start-column="9" selection-end-line="182" selection-end-column="9" />
+        <state relative-caret-position="685">
+          <caret line="347" column="33" selection-start-line="347" selection-start-column="33" selection-end-line="347" selection-end-column="33" />
           <folding>
             <element signature="e#9#15#0" expanded="true" />
           </folding>
