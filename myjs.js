@@ -54,7 +54,7 @@ async function getCoords(place) {
         });*/
 }
 let places=[];
-let placeNames = ["15 Boulder Cr.","79 Dean Ave.","the bookshelf",  "Second Cup", "Angel's Diner",
+let placeNames = ["the bookshelf","15 Boulder Cr.","79 Dean Ave.",  "Second Cup", "Angel's Diner",
  "Canadian Tire", "Walmart","Molloy's"];
 placeNames.forEach((item)=>{
     getCoords(item).then((coords)=>{
@@ -134,8 +134,87 @@ function getDistance( i1, i2 ){
     }
     return distances[idx];
 }
+
+
+function measureDistance(routes ){
+    let dist = 0;
+
+    for ( let i=0; i < routes.length-1; i++ ){
+        dist+=getDistance(routes[i],routes[i+1]);
+
+    }
+    return dist;
+
+
+}
+
+function measureAndShowDist( routes, algo, color ){
+    console.log("--------" + algo+ "----------");
+   let dist = measureDistance(routes);
+        let coords = routes.map(x=>places[x].coords);
+        L.polyline(coords, {color: color, weight:5}).addTo(mymap);
+        console.log("Distance: (" + coords.length+")-->" + dist);
+
+    return dist;
+}
 function onEverythingLoaded(){
+
+    measureAndShowDist(defaultRandomRoutes(),"default -random", 'red');
+
+    measureAndShowDist(closestNext(), "closestNext", 'blue' );
+
+
     console.log("OK");
-    console.log("boulder to booksehlf:" + getDistance( 0,2) );
-    console.log("dean to bookshelf:" + getDistance( 1,2));
+
+}
+
+function dumpRoutes(routes ){
+    for (let i=0; i < routes.length; i++ ){
+        console.log(i+"-> " + places[routes[i]].name );
+    }
+}
+
+function findClosest( p0, candidates ){
+    let winner = candidates[0];
+    let minVal = getDistance(p0, winner );
+    for ( let i=1; i < candidates.length; i++ ){
+        let dist = getDistance(p0, candidates[i]);
+        if ( dist < minVal ){
+            minVal = dist;
+            winner= candidates[i];
+        }
+    }
+    return winner;
+}
+//-algorithms----------------
+
+function defaultRandomRoutes(){
+    let routes=[];
+    for (let i=0; i< places.length; i++ ){
+        routes.push(i);
+    }
+    routes.push(0); // go home
+    return routes;
+}
+
+function closestNext(){
+    let routes=[0];
+    let remainders= [];
+    for ( let i=1; i <places.length; i++ ){
+        remainders.push(i);
+    }
+    let cur=0;
+    while ( remainders.length > 0 ){
+        let closest = findClosest(cur, remainders);
+        remainders = remainders.filter(x=>x !== closest);
+        cur = closest;
+        routes.push(closest);
+    }
+
+    routes.push(0); // go home
+    return routes;
+}
+
+function bruteForce(){
+
 }
