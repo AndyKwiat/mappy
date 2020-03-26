@@ -70,16 +70,20 @@ let placeNames = ["79 Dean Ave.",
     "53 Bennet Ave"
 
 ];
+function addPlace(item,coords){
+    L.marker(coords).addTo(mymap).bindPopup(item);
+    // marker.bindPopup("<b>Hello world!</b><br>I am a popup.")
+    places.push({name:item, coords:[parseFloat(coords[0]), parseFloat(coords[1])] });
+}
 placeNames.forEach((item)=>{
     getCoords(item).then((coords)=>{
         if (coords == null ){
             console.log("Can't get item " + item);
             return;
         }
+        addPlace(item, coords );
 
-        L.marker(coords).addTo(mymap).bindPopup(item);
-       // marker.bindPopup("<b>Hello world!</b><br>I am a popup.")
-        places.push({name:item, coords:[parseFloat(coords[0]), parseFloat(coords[1])] });
+
         if (places.length >= placeNames.length){
             onEverythingLoaded();
         }
@@ -171,13 +175,17 @@ function measureDistance(stops, start,end){
     return dist;
 }
 
+let lines=[];
 function measureAndShowDist( stops, start,end, algo, color ){
     console.log("--------" + algo+ "----------");
    let dist = measureDistance(stops, start,end);
         let coords = stops.map(x=>x.coords);
-        L.polyline(coords, {color: color, weight:5}).addTo(mymap);
-          L.polyline([coords[0],start.coords], {color: color, weight:2}).addTo(mymap);
-    L.polyline([coords[coords.length-1],end.coords], {color: color, weight:7}).addTo(mymap);
+        let l =  L.polyline(coords, {color: color, weight:5}).addTo(mymap);
+        lines.push(l);
+          l= L.polyline([coords[0],start.coords], {color: color, weight:2}).addTo(mymap);
+          lines.push(l);
+          l=    L.polyline([coords[coords.length-1],end.coords], {color: color, weight:7}).addTo(mymap);
+          lines.push(l);
         console.log("Distance: (" + coords.length+")-->" + dist);
 
     return dist;
@@ -251,6 +259,11 @@ function getPermutations( ar ){
 }
 function bruteForce(spots,start,end){
 
+    if ( spots.length > 6 ){
+        alert("TOO HARSHA BRUTE FORCE");
+        throw "ERROR";
+        return;
+    }
     let rems = spots.map((item,i)=>{
         return i;
     });
@@ -342,9 +355,24 @@ function findClusters(numClusters,  spots, show=false ){
 
 }
 function clusters(spots,startSpot,endSpot){
-    let clusters = findClusters(5, spots,true);
+    let clusters = findClusters(5, spots,false);
     let clusterPath = bruteForce(clusters,startSpot,endSpot);
-    measureAndShowDist(clusterPath, startSpot,endSpot,"clusters","black",);
+ //   measureAndShowDist(clusterPath, startSpot,endSpot,"clusters","black",);
+
+    let curStart = startSpot;
+    let curEnd = endSpot;
+    let final=[];
+    for (let i=0; i < clusterPath.length; i++ ){
+        if ( i < clusterPath.length-1 ){
+            curEnd = clusterPath[i+1];
+        }else{
+            curEnd = endSpot;
+        }
+        let insidePath = bruteForce(clusterPath[i].members, curStart,curEnd);
+        curStart = insidePath[insidePath.length-1];
+        final = final.concat(insidePath);
+    }
+    measureAndShowDist(final, startSpot,endSpot,"clusters-2","black",);
 
 
 }
@@ -360,8 +388,30 @@ function onEverythingLoaded(){
 
     let start = places.shift();
     clusters(places,start,start);
+    places.unshift(start);
 
 
+    mymap.on('click',onMapClick);
     console.log("OK");
 
 }
+
+var popup = L.popup();
+function clearLines(){
+    lines.forEach((l)=>{
+        l.remove();
+    })
+}
+function onMapClick(e){
+    addPlace("newPlace",[e.latlng.lat, e.latlng.lng]);
+    console.log("places" + places.length);
+    clearLines();
+    let start = places.shift();
+    clusters(places,start,start);
+    places.unshift(start);
+    /*popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(mymap);*/
+}
+
