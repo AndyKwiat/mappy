@@ -54,8 +54,8 @@ async function getCoords(place) {
         });*/
 }
 let places=[];
-let placeNames = ["the bookshelf","15 Boulder Cr.","79 Dean Ave.",  "Second Cup", "Angel's Diner",
- "Canadian Tire", "Walmart","Molloy's"];
+let placeNames = ["79 Dean Ave.","Walmart","the bookshelf","540 Victoria Rd N,",  "Second Cup", "200 Victoria Rd S",
+ "Canadian Tire", "St.Josephs Health Centre"];
 placeNames.forEach((item)=>{
     getCoords(item).then((coords)=>{
         if (coords == null ){
@@ -63,7 +63,8 @@ placeNames.forEach((item)=>{
             return;
         }
 
-        L.marker(coords).addTo(mymap);
+        L.marker(coords).addTo(mymap).bindPopup(item);
+       // marker.bindPopup("<b>Hello world!</b><br>I am a popup.")
         places.push({name:item, coords:coords });
         if (places.length >= placeNames.length){
             onEverythingLoaded();
@@ -159,11 +160,12 @@ function measureAndShowDist( routes, algo, color ){
 }
 function onEverythingLoaded(){
 
-  /*  measureAndShowDist(defaultRandomRoutes(),"default -random", 'red');
+   // measureAndShowDist(defaultRandomRoutes(),"default -random", 'red');
 
     measureAndShowDist(closestNext(), "closestNext", 'blue' );
-    measureAndShowDist(bruteForce(), "bruteForce", 'yellow');*/
-  bruteForce();
+    measureAndShowDist(bruteForce(), "bruteForce", 'yellow');
+
+    dumpRoutes(closestNext());
 
 
     console.log("OK");
@@ -236,12 +238,23 @@ function getPermutations( ar ){
 
 }
 function bruteForce(){
-    let remainders= [1,2,3,4];
-    /*for ( let i=1; i <places.length; i++ ){
+    let remainders = [];
+    for ( let i=1; i <places.length; i++ ){
         remainders.push(i);
-    }*/
-    let perms =[];
-     perms = getPermutations( remainders);
-    console.log(perms);
+    }
+
+    let perms = getPermutations( remainders);
+    let winner;
+    let min;
+    for (let i=0; i < perms.length; i++ ){
+        perms[i].push(0);
+        perms[i].unshift(0);
+        let dist = measureDistance(perms[i]);
+        if ( !winner || dist < min ){
+            min = dist;
+            winner = i;
+        }
+    }
+    return perms[winner];
 
 }
