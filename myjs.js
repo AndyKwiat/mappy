@@ -354,10 +354,14 @@ function findClusters(numClusters,  spots, show=false ){
     });
 
 }
-function clusters(spots,startSpot,endSpot){
+
+function clusterAlg(spots, startSpot, endSpot){
+    if ( spots.length <=5 ){
+        return bruteForce(spots, startSpot,endSpot);
+    }
     let clusters = findClusters(5, spots,false);
     let clusterPath = bruteForce(clusters,startSpot,endSpot);
- //   measureAndShowDist(clusterPath, startSpot,endSpot,"clusters","black",);
+ //   measureAndShowDist(clusterPath, startSpot,endSpot,"clusterAlg","black",);
 
     let curStart = startSpot;
     let curEnd = endSpot;
@@ -368,11 +372,12 @@ function clusters(spots,startSpot,endSpot){
         }else{
             curEnd = endSpot;
         }
-        let insidePath = bruteForce(clusterPath[i].members, curStart,curEnd);
+        let insidePath = clusterAlg(clusterPath[i].members, curStart,curEnd);
         curStart = insidePath[insidePath.length-1];
         final = final.concat(insidePath);
     }
-    measureAndShowDist(final, startSpot,endSpot,"clusters-2","black",);
+    return final;
+
 
 
 }
@@ -386,9 +391,7 @@ function onEverythingLoaded(){
   //  let routes = closestNext(places);
 //    dumpRoutes(routes,places);
 
-    let start = places.shift();
-    clusters(places,start,start);
-    places.unshift(start);
+    doClustering();
 
 
     mymap.on('click',onMapClick);
@@ -402,13 +405,18 @@ function clearLines(){
         l.remove();
     })
 }
+function doClustering(){
+    let start = places.shift();
+    let final = clusterAlg(places,start,start);
+    measureAndShowDist(final, start,start,"clusterAlg-2","black",);
+    places.unshift(start);
+}
 function onMapClick(e){
     addPlace("newPlace",[e.latlng.lat, e.latlng.lng]);
     console.log("places" + places.length);
     clearLines();
-    let start = places.shift();
-    clusters(places,start,start);
-    places.unshift(start);
+    doClustering();
+
     /*popup
         .setLatLng(e.latlng)
         .setContent("You clicked the map at " + e.latlng.toString())
