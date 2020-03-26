@@ -159,9 +159,11 @@ function measureAndShowDist( routes, algo, color ){
 }
 function onEverythingLoaded(){
 
-    measureAndShowDist(defaultRandomRoutes(),"default -random", 'red');
+  /*  measureAndShowDist(defaultRandomRoutes(),"default -random", 'red');
 
     measureAndShowDist(closestNext(), "closestNext", 'blue' );
+    measureAndShowDist(bruteForce(), "bruteForce", 'yellow');*/
+  bruteForce();
 
 
     console.log("OK");
@@ -214,7 +216,32 @@ function closestNext(){
     routes.push(0); // go home
     return routes;
 }
+function getPermutations( ar ){
 
+    if (ar.length <=1 ){
+        return [ar];
+    }
+    let res = [];
+    for (let i=0; i < ar.length; i++ ){
+        let copy = [...ar];
+        let val = copy[i];
+        copy.splice(i,1);
+        let perms = getPermutations(copy);
+        for (let i=0; i < perms.length; i++ ) {
+            perms[i].unshift(val);
+            res.push(perms[i]);
+        }
+    }
+    return res;
+
+}
 function bruteForce(){
+    let remainders= [1,2,3,4];
+    /*for ( let i=1; i <places.length; i++ ){
+        remainders.push(i);
+    }*/
+    let perms =[];
+     perms = getPermutations( remainders);
+    console.log(perms);
 
 }
