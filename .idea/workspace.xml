@@ -24,8 +24,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/myjs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="162" column="5" selection-start-line="162" selection-start-column="5" selection-end-line="162" selection-end-column="5" />
+            <state relative-caret-position="753">
+              <caret line="339" column="18" selection-start-line="339" selection-start-column="18" selection-end-line="339" selection-end-column="18" />
               <folding>
                 <element signature="e#9#15#0" expanded="true" />
               </folding>
@@ -56,6 +56,11 @@
     <findStrings>
       <find>feature</find>
       <find>l.marker</find>
+      <find>L.polyline(coords, {color: color, weight:5}).addTo(mymap);</find>
+      <find>circle</find>
+      <find>getdistance</find>
+      <find>poly</find>
+      <find>findcluster</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -72,10 +77,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="267" />
+    <option name="x" value="1429" />
     <option name="y" value="23" />
-    <option name="width" value="1680" />
-    <option name="height" value="935" />
+    <option name="width" value="1136" />
+    <option name="height" value="1325" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -122,11 +127,11 @@
     </option>
   </component>
   <component name="ToolWindowManager">
-    <frame x="267" y="23" width="1680" height="935" extended-state="0" />
+    <frame x="1429" y="23" width="1136" height="1325" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.08791209" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13162705" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" />
@@ -166,8 +171,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/myjs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="162" column="5" selection-start-line="162" selection-start-column="5" selection-end-line="162" selection-end-column="5" />
+        <state relative-caret-position="753">
+          <caret line="339" column="18" selection-start-line="339" selection-start-column="18" selection-end-line="339" selection-end-column="18" />
           <folding>
             <element signature="e#9#15#0" expanded="true" />
           </folding>

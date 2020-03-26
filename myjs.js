@@ -54,8 +54,22 @@ async function getCoords(place) {
         });*/
 }
 let places=[];
-let placeNames = ["79 Dean Ave.","Walmart","the bookshelf","540 Victoria Rd N,",  "Second Cup", "200 Victoria Rd S",
- "Canadian Tire", "St.Josephs Health Centre"];
+let placeNames = ["79 Dean Ave.",
+    "Walmart",
+    "the bookshelf",
+"540 Victoria Rd N,",
+    "Second Cup",
+    "200 Victoria Rd S",
+    "Canadian Tire",
+    "St.Josephs Health Centre",
+    "12 Drew St.",
+    "50 Rodney Blvd",
+    "85 Steffler Dr",
+    "258 Cole Rd",
+    "18 Walter St",
+    "53 Bennet Ave"
+
+];
 placeNames.forEach((item)=>{
     getCoords(item).then((coords)=>{
         if (coords == null ){
@@ -65,7 +79,7 @@ placeNames.forEach((item)=>{
 
         L.marker(coords).addTo(mymap).bindPopup(item);
        // marker.bindPopup("<b>Hello world!</b><br>I am a popup.")
-        places.push({name:item, coords:coords });
+        places.push({name:item, coords:[parseFloat(coords[0]), parseFloat(coords[1])] });
         if (places.length >= placeNames.length){
             onEverythingLoaded();
         }
@@ -119,13 +133,19 @@ fetch(url, {
     });*/
 
 let distances={};
+
+
 function calcDistance(i1, i2 ){
     let x1 = parseFloat(places[i1].coords[0]);
     let x2 = parseFloat(places[i2].coords[0]);
     let y1 = parseFloat(places[i1].coords[1]);
     let y2 = parseFloat(places[i2].coords[1]);
-    let dx = x2-x1;
-    let dy = y2-y1;
+    return calcDistanceCoords([x1,y1], [x2,y2]);
+}
+
+function calcDistanceCoords( c1, c2 ){
+    let dx = c2[0] - c1[0];
+    let dy = c2[1] - c1[1];
     return Math.sqrt(dx*dx+dy*dy)*100;// estimate
 }
 function getDistance( i1, i2 ){
@@ -158,19 +178,7 @@ function measureAndShowDist( routes, algo, color ){
 
     return dist;
 }
-function onEverythingLoaded(){
 
-   // measureAndShowDist(defaultRandomRoutes(),"default -random", 'red');
-
-    measureAndShowDist(closestNext(), "closestNext", 'blue' );
-    measureAndShowDist(bruteForce(), "bruteForce", 'yellow');
-
-    dumpRoutes(closestNext());
-
-
-    console.log("OK");
-
-}
 
 function dumpRoutes(routes ){
     for (let i=0; i < routes.length; i++ ){
@@ -256,5 +264,94 @@ function bruteForce(){
         }
     }
     return perms[winner];
+
+}
+function findClosestCoords(baseCoord, otherCoords ){
+    let winner = 0;
+    let min = calcDistanceCoords(baseCoord, otherCoords[0]);
+    for( let i=1; i < otherCoords.length; i++ ){
+        let dist = calcDistanceCoords(baseCoord, otherCoords[i]);
+        if ( dist < min ){
+            min = dist;
+            winner = i;
+        }
+    }
+    return winner;
+}
+function findClusters(numClusters, candidates, show=false ){
+    let k = []; // coords of cluster
+    let members=[];
+
+    for(let i=0; i < numClusters; i++ ){
+        k.push(places[i].coords);   // random placement
+        members.push([]);
+    }
+    for (let iter =0; iter< 47; iter++ ) {
+        let change = 0;
+        for(let i=0; i < numClusters; i++ ){
+            members[i] = [];
+        }
+        for (let i = 0; i < candidates.length; i++) {
+            let placeCoords = places[candidates[i]].coords;
+            let closestIndex = findClosestCoords(placeCoords, k);
+            members[closestIndex].push(placeCoords);
+        }
+
+        for (let i = 0; i < k.length; i++) {
+            let kids = members[i];
+            let total = [0, 0];
+            for (let j = 0; j < kids.length; j++) {
+                total[0] = total[0] + kids[j][0];
+                total[1] = total[1] + kids[j][1];
+            }
+            total[0] = total[0] / kids.length;
+            total[1] = total[1] / kids.length;
+
+
+            change += Math.abs(k[i][0] - total[0]) + Math.abs(k[i][1] - total[1]);
+            k[i] = total;
+
+        }
+        console.log("change--->" + change * 100);
+        if ( change *100 < .1 ){
+            break;
+        }
+    }
+    if ( show ) {
+        for (let i = 0; i < k.length; i++) {
+            var circle = L.circle(k[i], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 150
+            }).addTo(mymap);
+            let kids = members[i];
+            for (let j = 0; j < kids.length; j++) {
+                L.polyline([k[i], kids[j]], {color: 'green', weight: 1}).addTo(mymap);
+            }
+        }
+    }
+}
+function clusters(){
+    let remainders = [];
+    for ( let i=1; i <places.length; i++ ){
+        remainders.push(i);
+    }
+    findClusters(5, remainders,true);
+}
+function onEverythingLoaded(){
+
+    // measureAndShowDist(defaultRandomRoutes(),"default -random", 'red');
+
+    measureAndShowDist(closestNext(), "closestNext", 'blue' );
+
+    //measureAndShowDist(bruteForce(), "bruteForce", 'yellow');
+
+    dumpRoutes(closestNext());
+
+    clusters();
+
+
+    console.log("OK");
 
 }
