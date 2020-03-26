@@ -292,17 +292,17 @@ function findClusters(numClusters, candidates, show=false ){
             members[i] = [];
         }
         for (let i = 0; i < candidates.length; i++) {
-            let placeCoords = places[candidates[i]].coords;
-            let closestIndex = findClosestCoords(placeCoords, k);
-            members[closestIndex].push(placeCoords);
+            let place =places[candidates[i]];
+            let closestIndex = findClosestCoords(place.coords, k);
+            members[closestIndex].push(place);
         }
 
         for (let i = 0; i < k.length; i++) {
             let kids = members[i];
             let total = [0, 0];
             for (let j = 0; j < kids.length; j++) {
-                total[0] = total[0] + kids[j][0];
-                total[1] = total[1] + kids[j][1];
+                total[0] = total[0] + kids[j].coords[0];
+                total[1] = total[1] + kids[j].coords[1];
             }
             total[0] = total[0] / kids.length;
             total[1] = total[1] / kids.length;
@@ -327,10 +327,12 @@ function findClusters(numClusters, candidates, show=false ){
             }).addTo(mymap);
             let kids = members[i];
             for (let j = 0; j < kids.length; j++) {
-                L.polyline([k[i], kids[j]], {color: 'green', weight: 1}).addTo(mymap);
+                L.polyline([k[i], kids[j].coords], {color: 'green', weight: 1}).addTo(mymap);
             }
         }
     }
+    return members;
+
 }
 function clusters(){
     let remainders = [];
