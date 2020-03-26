@@ -135,11 +135,11 @@ fetch(url, {
 let distances={};
 
 
-function calcDistance(i1, i2 ){
-    let x1 = parseFloat(places[i1].coords[0]);
-    let x2 = parseFloat(places[i2].coords[0]);
-    let y1 = parseFloat(places[i1].coords[1]);
-    let y2 = parseFloat(places[i2].coords[1]);
+function calcDistance(i1, i2 ,spots){
+    let x1 = parseFloat(spots[i1].coords[0]);
+    let x2 = parseFloat(spots[i2].coords[0]);
+    let y1 = parseFloat(spots[i1].coords[1]);
+    let y2 = parseFloat(spots[i2].coords[1]);
     return calcDistanceCoords([x1,y1], [x2,y2]);
 }
 
@@ -148,20 +148,20 @@ function calcDistanceCoords( c1, c2 ){
     let dy = c2[1] - c1[1];
     return Math.sqrt(dx*dx+dy*dy)*100;// estimate
 }
-function getDistance( i1, i2 ){
+function getDistance( i1, i2 ,spots){
     let idx =  i1 + "->" + i2;
     if ( !distances[idx] ){
-        distances[idx] = calcDistance(i1,i2);
+        distances[idx] = calcDistance(i1,i2,spots);
     }
     return distances[idx];
 }
 
 
-function measureDistance(routes ){
+function measureDistance(routes,spots ){
     let dist = 0;
 
     for ( let i=0; i < routes.length-1; i++ ){
-        dist+=getDistance(routes[i],routes[i+1]);
+        dist+=getDistance(routes[i],routes[i+1],spots);
 
     }
     return dist;
@@ -169,10 +169,10 @@ function measureDistance(routes ){
 
 }
 
-function measureAndShowDist( routes, algo, color ){
+function measureAndShowDist( routes, algo, color ,spots){
     console.log("--------" + algo+ "----------");
-   let dist = measureDistance(routes);
-        let coords = routes.map(x=>places[x].coords);
+   let dist = measureDistance(routes,spots);
+        let coords = routes.map(x=>spots[x].coords);
         L.polyline(coords, {color: color, weight:5}).addTo(mymap);
         console.log("Distance: (" + coords.length+")-->" + dist);
 
@@ -180,17 +180,17 @@ function measureAndShowDist( routes, algo, color ){
 }
 
 
-function dumpRoutes(routes ){
+function dumpRoutes(routes,spots ){
     for (let i=0; i < routes.length; i++ ){
-        console.log(i+"-> " + places[routes[i]].name );
+        console.log(i+"-> " + spots[routes[i]].name );
     }
 }
 
-function findClosest( p0, candidates ){
+function findClosest( p0, candidates,spots ){
     let winner = candidates[0];
-    let minVal = getDistance(p0, winner );
+    let minVal = getDistance(p0, winner ,spots);
     for ( let i=1; i < candidates.length; i++ ){
-        let dist = getDistance(p0, candidates[i]);
+        let dist = getDistance(p0, candidates[i],spots);
         if ( dist < minVal ){
             minVal = dist;
             winner= candidates[i];
@@ -200,24 +200,24 @@ function findClosest( p0, candidates ){
 }
 //-algorithms----------------
 
-function defaultRandomRoutes(){
+function defaultRandomRoutes(spots){
     let routes=[];
-    for (let i=0; i< places.length; i++ ){
+    for (let i=0; i< spots.length; i++ ){
         routes.push(i);
     }
     routes.push(0); // go home
     return routes;
 }
 
-function closestNext(){
+function closestNext(spots){
     let routes=[0];
     let remainders= [];
-    for ( let i=1; i <places.length; i++ ){
+    for ( let i=1; i <spots.length; i++ ){
         remainders.push(i);
     }
     let cur=0;
     while ( remainders.length > 0 ){
-        let closest = findClosest(cur, remainders);
+        let closest = findClosest(cur, remainders,spots);
         remainders = remainders.filter(x=>x !== closest);
         cur = closest;
         routes.push(closest);
@@ -245,9 +245,9 @@ function getPermutations( ar ){
     return res;
 
 }
-function bruteForce(){
+function bruteForce(spots){
     let remainders = [];
-    for ( let i=1; i <places.length; i++ ){
+    for ( let i=1; i <spots.length; i++ ){
         remainders.push(i);
     }
 
@@ -278,12 +278,12 @@ function findClosestCoords(baseCoord, otherCoords ){
     }
     return winner;
 }
-function findClusters(numClusters, candidates, show=false ){
+function findClusters(numClusters, candidates, spots, show=false ){
     let k = []; // coords of cluster
     let members=[];
 
     for(let i=0; i < numClusters; i++ ){
-        k.push(places[i].coords);   // random placement
+        k.push(spots[i].coords);   // random placement
         members.push([]);
     }
     for (let iter =0; iter< 47; iter++ ) {
@@ -292,7 +292,7 @@ function findClusters(numClusters, candidates, show=false ){
             members[i] = [];
         }
         for (let i = 0; i < candidates.length; i++) {
-            let place =places[candidates[i]];
+            let place =spots[candidates[i]];
             let closestIndex = findClosestCoords(place.coords, k);
             members[closestIndex].push(place);
         }
@@ -334,24 +334,24 @@ function findClusters(numClusters, candidates, show=false ){
     return members;
 
 }
-function clusters(){
+function clusters(spots){
     let remainders = [];
-    for ( let i=1; i <places.length; i++ ){
+    for ( let i=1; i <spots.length; i++ ){
         remainders.push(i);
     }
-    findClusters(5, remainders,true);
+    findClusters(5, remainders,spots,true);
 }
 function onEverythingLoaded(){
 
     // measureAndShowDist(defaultRandomRoutes(),"default -random", 'red');
 
-    measureAndShowDist(closestNext(), "closestNext", 'blue' );
+    measureAndShowDist(closestNext(places), "closestNext", 'blue' ,places);
 
     //measureAndShowDist(bruteForce(), "bruteForce", 'yellow');
+    let routes = closestNext(places);
+    dumpRoutes(routes,places);
 
-    dumpRoutes(closestNext());
-
-    clusters();
+    clusters(places);
 
 
     console.log("OK");
