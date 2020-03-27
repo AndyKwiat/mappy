@@ -1,5 +1,6 @@
 var mymap = L.map('mapid').setView([43.5448, -80.2482], 13);
 var clusterLayer = L.layerGroup().addTo(mymap);
+var pathLayer = L.layerGroup().addTo(mymap);
 
 let numDrivers = 1;
 
@@ -178,17 +179,14 @@ function measureDistance(stops, start,end){
     return dist;
 }
 
-let lines=[];
+
 function measureAndShowDist( stops, start,end, algo, color ){
     console.log("--------" + algo+ "----------");
    let dist = measureDistance(stops, start,end);
         let coords = stops.map(x=>x.coords);
-        let l =  L.polyline(coords, {color: color, weight:5}).addTo(mymap);
-        lines.push(l);
-          l= L.polyline([coords[0],start.coords], {color: color, weight:2}).addTo(mymap);
-          lines.push(l);
-          l=    L.polyline([coords[coords.length-1],end.coords], {color: color, weight:7}).addTo(mymap);
-          lines.push(l);
+          L.polyline(coords, {color: color, weight:5}).addTo(pathLayer);
+          L.polyline([coords[0],start.coords], {color: color, weight:3}).addTo(pathLayer);
+          L.polyline([coords[coords.length-1],end.coords], {color: color, weight:3}).addTo(pathLayer);
         console.log("Distance: (" + coords.length+")-->" + dist);
 
     return dist;
@@ -425,23 +423,22 @@ function onEverythingLoaded(){
 }
 
 var popup = L.popup();
-function clearLines(){
-    lines.forEach((l)=>{
-        l.remove();
-    })
-}
+
 function doClustering(){
-    findClusters(numDrivers,places ,true,true);
-    return;
+    pathLayer.clearLayers();
     let start = places.shift();
-    let final = clusterAlg(places,start,start);
-    measureAndShowDist(final, start,start,"clusterAlg-2","black",);
+    let clusters = findClusters(numDrivers,places ,false,true);
+    let colors = ['black','red','blue','green']
+    for (let i=0; i < clusters.length; i++ ) {
+        let final = clusterAlg(clusters[i].members, start, start);
+        measureAndShowDist(final, start, start, "clusterAlg-2", colors[i]);
+    }
     places.unshift(start);
 }
 function onMapClick(e){
     addPlace("newPlace",[e.latlng.lat, e.latlng.lng]);
     console.log("places" + places.length);
-    clearLines();
+
     doClustering();
 
     /*popup
