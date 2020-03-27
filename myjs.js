@@ -1,6 +1,7 @@
 var mymap = L.map('mapid').setView([43.5448, -80.2482], 13);
 var clusterLayer = L.layerGroup().addTo(mymap);
 var pathLayer = L.layerGroup().addTo(mymap);
+var routeLayer = L.layerGroup().addTo(mymap);
 
 let numDrivers = 1;
 
@@ -98,6 +99,9 @@ placeNames.forEach((item)=>{
 
 
 
+
+
+
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
@@ -124,22 +128,22 @@ function getCookie(cname) {
 
 
 // ROUTING /DIRECTIONS
-
-/*var url="https://api.mapbox.com/directions/v5/mapbox/driving?access_token=pk.eyJ1IjoiYWt3aWF0IiwiYSI6ImNrODdqOGlqejAwanMzZm5tMTBvMmp5NmoifQ.igfG4pPw8BufL5PKy1BIkA"
+/*
+var url="https://api.mapbox.com/directions/v5/mapbox/driving?access_token=pk.eyJ1IjoiYWt3aWF0IiwiYSI6ImNrODdqOGlqejAwanMzZm5tMTBvMmp5NmoifQ.igfG4pPw8BufL5PKy1BIkA"
 fetch(url, {
     method: 'POST',
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body:"coordinates=-80.2482,43.5448;-80.2462,43.5448&&steps=true"
+    body:"coordinates=-80.2482,43.5448;-80.2462,43.5448;-80.2472,43.5448;-80.2482,43.5448&&steps=true"
 }).then((response) => {
     return response.json();
 })
     .then((data) => {
         console.log(data);
-    });*/
-
+    });
+*/
 let distances={};
 
 
@@ -181,13 +185,13 @@ function measureDistance(stops, start,end){
 
 
 function measureAndShowDist( stops, start,end, algo, color ){
-    console.log("--------" + algo+ "----------");
+    //console.log("--------" + algo+ "----------");
    let dist = measureDistance(stops, start,end);
         let coords = stops.map(x=>x.coords);
-          L.polyline(coords, {color: color, weight:5}).addTo(pathLayer);
-          L.polyline([coords[0],start.coords], {color: color, weight:3}).addTo(pathLayer);
-          L.polyline([coords[coords.length-1],end.coords], {color: color, weight:3}).addTo(pathLayer);
-        console.log("Distance: (" + coords.length+")-->" + dist);
+          L.polyline(coords, {color: color, weight:3, dashArray:4}).addTo(pathLayer);
+          L.polyline([coords[0],start.coords], {color: color, weight:3, dashArray:4}).addTo(pathLayer);
+          L.polyline([coords[coords.length-1],end.coords], {color: color, weight:3, dashArray:4}).addTo(pathLayer);
+        //console.log("Distance: (" + coords.length+")-->" + dist);
 
     return dist;
 }
@@ -420,11 +424,66 @@ function onEverythingLoaded(){
 
     document.getElementById("cars").setAttribute('onchange', 'parseInt(onChangeNumDrivers(this.options[this.selectedIndex].value))');
 
+    document.getElementById("routeButton").addEventListener("click",drawAllRoutes);
+    let test = [places[0],places[1],places[2]];
+    getRoute(test).then((route)=>{
+        drawRoute(route,'yellow');
+    });
 }
+function drawAllRoutes(){
+    alert("kew");
+}
+function drawRoute( route , color ){
+    let coords = [];
+    let legs = route.routes[0].legs;
+    for ( const l of legs ) {
+        for (const s of l.steps) {
+            coords.push(s.maneuver.location.reverse());
+        }
+    }
+
+    L.polyline(coords, {color: color, weight:5}).addTo(routeLayer);
+}
+
+
+async function getRoute(places){
+
+    let str="";
+    for ( let i=0; i < places.length; i++ ){
+        str+= places[i].coords[1]+"," + places[i].coords[0];
+        if ( i < places.length-1 ){
+            str+=";"
+        }
+    }
+
+    var value = getCookie("route"+ str);
+    if (value && value != "" ){
+        return value;
+    }
+
+    var url="https://api.mapbox.com/directions/v5/mapbox/driving?access_token=pk.eyJ1IjoiYWt3aWF0IiwiYSI6ImNrODdqOGlqejAwanMzZm5tMTBvMmp5NmoifQ.igfG4pPw8BufL5PKy1BIkA"
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body:"coordinates="+str+"&&steps=true"
+    }).then((response) => {
+        return response.json();
+    })
+        .then((data) => {
+            setCookie("route"+str,data,30);
+            return data;
+        });
+}
+
+
 
 var popup = L.popup();
 
 function doClustering(){
+
     pathLayer.clearLayers();
     let start = places.shift();
     let clusters = findClusters(numDrivers,places ,false,true);
@@ -435,6 +494,7 @@ function doClustering(){
     }
     places.unshift(start);
 }
+
 function onMapClick(e){
     addPlace("newPlace",[e.latlng.lat, e.latlng.lng]);
     console.log("places" + places.length);
