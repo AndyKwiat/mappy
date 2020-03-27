@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ebcf516-7d03-4e2a-a104-6d47a6b86809" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/myjs.js" beforeDir="false" afterPath="$PROJECT_DIR$/myjs.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,8 +16,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="18" column="46" selection-start-line="18" selection-start-column="46" selection-end-line="18" selection-end-column="46" />
+            <state relative-caret-position="408">
+              <caret line="24" column="27" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
             </state>
           </provider>
         </entry>
@@ -24,8 +25,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/myjs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="727">
-              <caret line="434" selection-start-line="434" selection-end-line="434" />
+            <state relative-caret-position="406">
+              <caret line="426" column="83" selection-start-line="426" selection-start-column="83" selection-end-line="426" selection-end-column="83" />
               <folding>
                 <element signature="e#9#15#0" expanded="true" />
               </folding>
@@ -54,10 +55,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>feature</find>
-      <find>l.marker</find>
-      <find>L.polyline(coords, {color: color, weight:5}).addTo(mymap);</find>
-      <find>getdistance</find>
       <find>poly</find>
       <find>findcluster</find>
       <find>places</find>
@@ -75,6 +72,19 @@
       <find>clusterlayer</find>
       <find>clearlines</find>
       <find>clearlayers</find>
+      <find>mapbox</find>
+      <find>getcoords</find>
+      <find>console.l</find>
+      <find>distance:</find>
+      <find>oneverythingloaded</find>
+      <find>routing</find>
+      <find>getroute</find>
+      <find>fetch</find>
+      <find>getcookie</find>
+      <find>getcook</find>
+      <find>polyline</find>
+      <find>drawroute</find>
+      <find>button</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -84,8 +94,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/mstyles.css" />
+        <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/myjs.js" />
       </list>
     </option>
@@ -184,15 +194,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="46" selection-start-line="18" selection-start-column="46" selection-end-line="18" selection-end-column="46" />
+        <state relative-caret-position="408">
+          <caret line="24" column="27" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/myjs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="727">
-          <caret line="434" selection-start-line="434" selection-end-line="434" />
+        <state relative-caret-position="406">
+          <caret line="426" column="83" selection-start-line="426" selection-start-column="83" selection-end-line="426" selection-end-column="83" />
           <folding>
             <element signature="e#9#15#0" expanded="true" />
           </folding>
