@@ -1,2 +1,23 @@
+#root{
+
+    display: grid;
+    grid-template-columns: 230px auto;
+}
+
 #mapid { height: 660px;
     }
+#cars {
+    grid-column:1;
+
+}
+#addressbox{
+    grid-column:1;
+
+}
+textarea{
+    height:1500px;
+    width:230px;
+    font-family:arial;
+    font-size:medium;
+
+}

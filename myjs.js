@@ -1,4 +1,7 @@
 var mymap = L.map('mapid').setView([43.5448, -80.2482], 13);
+var clusterLayer = L.layerGroup().addTo(mymap);
+
+let numDrivers = 1;
 
 /*var circle = L.circle([43.5448, -80.2482], {
     color: 'red',
@@ -284,11 +287,17 @@ function bruteForce(spots,start,end){
     return winner;
 
 }
-function findClosestCoords(baseCoord, otherCoords ){
+function findClosestCoords(baseCoord, otherCoords, penalty ){
     let winner = 0;
     let min = calcDistanceCoords(baseCoord, otherCoords[0]);
+    if ( penalty && min > penalty[0] ){
+        min += penalty[0];
+    }
     for( let i=1; i < otherCoords.length; i++ ){
         let dist = calcDistanceCoords(baseCoord, otherCoords[i]);
+        if ( penalty && dist > penalty[i]){
+            dist += penalty[i];
+        }
         if ( dist < min ){
             min = dist;
             winner = i;
@@ -296,22 +305,30 @@ function findClosestCoords(baseCoord, otherCoords ){
     }
     return winner;
 }
-function findClusters(numClusters,  spots, show=false ){
+function findClusters(numClusters,  spots, show=false , balanceNumbers = false){
     let k = []; // coords of cluster
+    let penalty = []; // trying to even out the clusters a bit
     let members=[];
+
+
 
     for(let i=0; i < numClusters; i++ ){
         k.push(spots[i].coords);   // random placement
         members.push([]);
+        penalty.push(0);
     }
     for (let iter =0; iter< 47; iter++ ) {
         let change = 0;
         for(let i=0; i < numClusters; i++ ){
+            penalty[i] = 0;
+            if ( balanceNumbers && members[i] ){
+                penalty[i] = members[i].length*0.2;
+            }
             members[i] = [];
         }
         for (let i = 0; i < spots.length; i++) {
             let place =spots[i];
-            let closestIndex = findClosestCoords(place.coords, k);
+            let closestIndex = findClosestCoords(place.coords, k, penalty);
             members[closestIndex].push(place);
         }
 
@@ -322,8 +339,13 @@ function findClusters(numClusters,  spots, show=false ){
                 total[0] = total[0] + kids[j].coords[0];
                 total[1] = total[1] + kids[j].coords[1];
             }
-            total[0] = total[0] / kids.length;
-            total[1] = total[1] / kids.length;
+            if ( kids.length <=0 ){
+                total[0] = 0;
+                total[1] = 0;
+            }else {
+                total[0] = total[0] / kids.length;
+                total[1] = total[1] / kids.length;
+            }
 
 
             change += Math.abs(k[i][0] - total[0]) + Math.abs(k[i][1] - total[1]);
@@ -336,16 +358,17 @@ function findClusters(numClusters,  spots, show=false ){
         }
     }
     if ( show ) {
+        clusterLayer.clearLayers();
         for (let i = 0; i < k.length; i++) {
             var circle = L.circle(k[i], {
                 color: 'red',
                 fillColor: '#f03',
                 fillOpacity: 0.5,
                 radius: 150
-            }).addTo(mymap);
+            }).addTo(clusterLayer);
             let kids = members[i];
             for (let j = 0; j < kids.length; j++) {
-                L.polyline([k[i], kids[j].coords], {color: 'green', weight: 1}).addTo(mymap);
+                L.polyline([k[i], kids[j].coords], {color: 'green', weight: 1}).addTo(clusterLayer);
             }
         }
     }
@@ -397,6 +420,8 @@ function onEverythingLoaded(){
     mymap.on('click',onMapClick);
     console.log("OK");
 
+    document.getElementById("cars").setAttribute('onchange', 'parseInt(onChangeNumDrivers(this.options[this.selectedIndex].value))');
+
 }
 
 var popup = L.popup();
@@ -406,6 +431,8 @@ function clearLines(){
     })
 }
 function doClustering(){
+    findClusters(numDrivers,places ,true,true);
+    return;
     let start = places.shift();
     let final = clusterAlg(places,start,start);
     measureAndShowDist(final, start,start,"clusterAlg-2","black",);
@@ -421,5 +448,11 @@ function onMapClick(e){
         .setLatLng(e.latlng)
         .setContent("You clicked the map at " + e.latlng.toString())
         .openOn(mymap);*/
+}
+
+//---------------------------------
+function onChangeNumDrivers(count ){
+    numDrivers = count;
+    doClustering();
 }
 
