@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ebcf516-7d03-4e2a-a104-6d47a6b86809" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/myjs.js" beforeDir="false" afterPath="$PROJECT_DIR$/myjs.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -25,8 +24,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/myjs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="406">
-              <caret line="426" column="83" selection-start-line="426" selection-start-column="83" selection-end-line="426" selection-end-column="83" />
+            <state relative-caret-position="429">
+              <caret line="463" column="60" lean-forward="true" selection-start-line="463" selection-start-column="60" selection-end-line="463" selection-end-column="60" />
               <folding>
                 <element signature="e#9#15#0" expanded="true" />
               </folding>
@@ -55,21 +54,14 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>poly</find>
-      <find>findcluster</find>
-      <find>places</find>
-      <find>dumproutes</find>
       <find>bruteforce</find>
       <find>measuredistance</find>
-      <find>findclosest</find>
       <find>measureandshow</find>
       <find>circle</find>
-      <find>.marker</find>
       <find>brutefor</find>
       <find>findclusters</find>
       <find>penalty</find>
       <find>lines</find>
-      <find>clusterlayer</find>
       <find>clearlines</find>
       <find>clearlayers</find>
       <find>mapbox</find>
@@ -85,6 +77,13 @@
       <find>polyline</find>
       <find>drawroute</find>
       <find>button</find>
+      <find>clusterlayer</find>
+      <find>findclosest</find>
+      <find>closestnext</find>
+      <find>closest</find>
+      <find>places</find>
+      <find>.marker</find>
+      <find>popup</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -201,8 +200,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/myjs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="426" column="83" selection-start-line="426" selection-start-column="83" selection-end-line="426" selection-end-column="83" />
+        <state relative-caret-position="429">
+          <caret line="463" column="60" lean-forward="true" selection-start-line="463" selection-start-column="60" selection-end-line="463" selection-end-column="60" />
           <folding>
             <element signature="e#9#15#0" expanded="true" />
           </folding>

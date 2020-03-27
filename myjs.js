@@ -2,7 +2,7 @@ var mymap = L.map('mapid').setView([43.5448, -80.2482], 13);
 var clusterLayer = L.layerGroup().addTo(mymap);
 var pathLayer = L.layerGroup().addTo(mymap);
 var routeLayer = L.layerGroup().addTo(mymap);
-
+let colors = ['black','red','blue','green','purple'];
 let numDrivers = 1;
 
 /*var circle = L.circle([43.5448, -80.2482], {
@@ -62,7 +62,8 @@ let places=[];
 let placeNames = ["79 Dean Ave.",
     "Walmart",
     "the bookshelf",
-"540 Victoria Rd N,",
+"540 Victoria Rd N" ];
+/*,
     "Second Cup",
     "200 Victoria Rd S",
     "Canadian Tire",
@@ -74,7 +75,7 @@ let placeNames = ["79 Dean Ave.",
     "18 Walter St",
     "53 Bennet Ave"
 
-];
+];*/
 function addPlace(item,coords){
     L.marker(coords).addTo(mymap).bindPopup(item);
     // marker.bindPopup("<b>Hello world!</b><br>I am a popup.")
@@ -186,11 +187,12 @@ function measureDistance(stops, start,end){
 
 function measureAndShowDist( stops, start,end, algo, color ){
     //console.log("--------" + algo+ "----------");
+    let wt = 4;
    let dist = measureDistance(stops, start,end);
         let coords = stops.map(x=>x.coords);
-          L.polyline(coords, {color: color, weight:3, dashArray:4}).addTo(pathLayer);
-          L.polyline([coords[0],start.coords], {color: color, weight:3, dashArray:4}).addTo(pathLayer);
-          L.polyline([coords[coords.length-1],end.coords], {color: color, weight:3, dashArray:4}).addTo(pathLayer);
+          L.polyline(coords, {color: color, weight:wt, dashArray:4}).addTo(pathLayer);
+          L.polyline([coords[0],start.coords], {color: color, weight:wt, dashArray:4}).addTo(pathLayer);
+          L.polyline([coords[coords.length-1],end.coords], {color: color, weight:wt, dashArray:4}).addTo(pathLayer);
         //console.log("Distance: (" + coords.length+")-->" + dist);
 
     return dist;
@@ -226,21 +228,17 @@ function defaultRandomRoutes(spots){
     return routes;
 }
 
-function closestNext(spots){
-    let routes=[0];
-    let remainders= [];
-    for ( let i=1; i <spots.length; i++ ){
-        remainders.push(i);
-    }
-    let cur=0;
-    while ( remainders.length > 0 ){
-        let closest = findClosest(cur, remainders,spots);
-        remainders = remainders.filter(x=>x !== closest);
+function closestNext(spots,start,end){
+    let routes=[];
+    let cur = start;
+
+    while ( spots.length > 0 ){
+        let closest = spots[findClosestCoords(cur.coords, spots.map(x=>x.coords) )];
+        spots = spots.filter(x=>x != closest);
         cur = closest;
         routes.push(closest);
     }
 
-    routes.push(0); // go home
     return routes;
 }
 function getPermutations( ar ){
@@ -425,28 +423,51 @@ function onEverythingLoaded(){
     document.getElementById("cars").setAttribute('onchange', 'parseInt(onChangeNumDrivers(this.options[this.selectedIndex].value))');
 
     document.getElementById("routeButton").addEventListener("click",drawAllRoutes);
-    let test = [places[0],places[1],places[2]];
-    getRoute(test).then((route)=>{
-        drawRoute(route,'yellow');
-    });
+    /*let test = [places[0],places[1],places[2]];
+    getDirections(test).then((route)=>{
+        drawDirections(route,'yellow');
+    });*/
 }
+let allRoutes;
 function drawAllRoutes(){
-    alert("kew");
+    routeLayer.clearLayers();
+    clusterLayer.clearLayers();
+    pathLayer.clearLayers();
+
+    if ( !allRoutes ){
+        return;
+    }
+    let i=0;
+    for (const r of allRoutes ){
+        let j=i;
+        getDirections(r).then((directions)=>{
+        drawDirections(directions,colors[j]);});
+        i++;
+    }
+    clusterLayer.clearLayers();
 }
-function drawRoute( route , color ){
+function drawDirections(route , color ){
     let coords = [];
     let legs = route.routes[0].legs;
     for ( const l of legs ) {
         for (const s of l.steps) {
-            coords.push(s.maneuver.location.reverse());
+            for ( const i of s.intersections ){
+                coords.push(i.location.reverse());
+            }
+           // coords.push(s.maneuver.location.reverse());
         }
     }
 
     L.polyline(coords, {color: color, weight:5}).addTo(routeLayer);
+    L.popup()
+        .setLatLng(coords[coords.length/2])
+        .setContent('Distance: ' + route.routes[0].distance)
+        .openOn(routeLayer);
+
 }
 
 
-async function getRoute(places){
+async function getDirections(places){
 
     let str="";
     for ( let i=0; i < places.length; i++ ){
@@ -487,10 +508,17 @@ function doClustering(){
     pathLayer.clearLayers();
     let start = places.shift();
     let clusters = findClusters(numDrivers,places ,false,true);
-    let colors = ['black','red','blue','green']
+
+    allRoutes=[];
     for (let i=0; i < clusters.length; i++ ) {
-        let final = clusterAlg(clusters[i].members, start, start);
+        //let final = clusterAlg(clusters[i].members, start, start);
+        let final = closestNext(clusters[i].members, start,start );
+
         measureAndShowDist(final, start, start, "clusterAlg-2", colors[i]);
+        let r = final;
+        r.push(start);
+        r.unshift(start);
+        allRoutes.push(r);
     }
     places.unshift(start);
 }
